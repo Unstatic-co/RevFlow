@@ -111,6 +111,11 @@ enum TransactionType {
   Refund
 }
 
+enum Environemnt {
+  Production
+  Sandbox
+}
+
 model Transaction {
   // id is the transaction id from the source, e.g. Apple's transaction id
   id String @id @unique @default(uuid())
@@ -136,6 +141,9 @@ model Transaction {
 
   // available for refunds
   revocationDate DateTime?
+
+  // environment: Production, Sandbox
+  environment Environemnt
 
   quantity Int @default(1)
 
