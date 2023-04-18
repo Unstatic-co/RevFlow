@@ -1,16 +1,20 @@
 // an express app
 import express from 'express'
+import { PrismaClient } from '@prisma/client'
 
 const app = express()
+const prismaClient = new PrismaClient()
+
+app.use(express.json())
 
 app.post('/api/v1/storekit-callback')
 app.post('/api/v1/google-play-callback')
 
-// Register a profile
-app.post('/api/v1/profiles')
+// sign in with an external user, if no external user provided, return an annoymous user id.
+app.post('/api/v1/auth/sign-in')
 
-// Register an user
-app.post('/api/v1/users')
+// link an external user to an existing user
+app.post('/api/v1/appUsers/:appUserId/link')
 
-// assign a profile to a user
-app.post('/api/v1/users/:userId/profiles')
+// set attributes like name, email, etc.
+app.post('/api/v1/appUsers/:appUserId/attributes')

@@ -18,19 +18,9 @@ model AppUser {
   App   App    @relation(fields: [appId], references: [id])
   appId String
 
-  profiles              AppUserProfile[]
+  customAttributes      Json?
   communicationChannels CommunicationChannel[]
-
-  transactions Transaction[]
-}
-
-model AppUserProfile {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  AppUser   AppUser? @relation(fields: [appUserId], references: [id])
-  appUserId String?
+  transactions          Transaction[]
 }
 
 enum CommunicationChannelType {
