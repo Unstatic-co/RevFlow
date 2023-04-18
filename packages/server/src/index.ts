@@ -3,8 +3,14 @@ import express from 'express'
 
 const app = express()
 
-app.post('/callback/storekit')
-app.post('/callback/google-play')
+app.post('/api/v1/storekit-callback')
+app.post('/api/v1/google-play-callback')
 
-app.post('/users/register')
-app.get('/users/entitlements')
+// Register a profile
+app.post('/api/v1/profiles')
+
+// Register an user
+app.post('/api/v1/users')
+
+// assign a profile to a user
+app.post('/api/v1/users/:userId/profiles')

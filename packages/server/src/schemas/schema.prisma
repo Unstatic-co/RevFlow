@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,19 +8,61 @@ datasource db {
 }
 
 model AppUser {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  lastSeen  DateTime?
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  // user storekit locale
-  storeKitCountryCode String?
+  // external user id, e.g. firebase uid
+  externalUserId String?
+
+  App   App    @relation(fields: [appId], references: [id])
+  appId String
+
+  profiles              AppUserProfile[]
+  communicationChannels CommunicationChannel[]
 
   transactions Transaction[]
+}
 
-  App   App?    @relation(fields: [appId], references: [id])
-  appId String?
+model AppUserProfile {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  AppUser   AppUser? @relation(fields: [appUserId], references: [id])
+  appUserId String?
+}
+
+enum CommunicationChannelType {
+  Email
+  Push
+}
+
+enum CommunicationChannelSubType {
+  PushAPNS
+  PushFCM
+}
+
+model CommunicationChannel {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime  @default(now())
+  lastSeen    DateTime?
+
+  isActive Boolean @default(true)
+
+  // communication channel type
+  type CommunicationChannelType
+
+  // communication channel sub type
+  subType CommunicationChannelSubType?
+
+  // communication channel address, e.g. email address, push token
+  address String
+
+  AppUser   AppUser? @relation(fields: [appUserId], references: [id])
+  appUserId String?
 }
 
 model App {
@@ -42,9 +81,6 @@ model App {
   // subscription groups
   subscriptionGroups SubscriptionGroup[]
 
-  // products
-  products Product[]
-
   // app users
   users AppUser[]
 
@@ -54,27 +90,29 @@ model App {
 
 // a subscription group contains a list of products
 model SubscriptionGroup {
-  id          String    @id @default(uuid())
+  id          String   @id @default(uuid())
   name        String
   description String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  products    Product[]
-  App         App?      @relation(fields: [appId], references: [id])
-  appId       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  subscriptions Subscription[]
+
+  App   App    @relation(fields: [appId], references: [id])
+  appId String
 }
 
-enum ProductType {
-  Subscription
-  OneTimePurchase
+enum DurationUnit {
+  Day
+  Week
+  Month
+  Year
 }
 
-model Product {
+model Subscription {
   id          String  @id @unique
   name        String
   description String?
-
-  productType ProductType
 
   storeKitProductId String?
   storeKitPriceTier String?
@@ -91,10 +129,11 @@ model Product {
 
   transactions Transaction[]
 
-  SubscriptionGroup   SubscriptionGroup? @relation(fields: [subscriptionGroupId], references: [id])
-  subscriptionGroupId String?
-  App                 App?               @relation(fields: [appId], references: [id])
-  appId               String?
+  SubscriptionGroup   SubscriptionGroup @relation(fields: [subscriptionGroupId], references: [id])
+  subscriptionGroupId String
+
+  durationUnit  DurationUnit
+  durationValue Int
 }
 
 enum TransactionSource {
@@ -130,7 +169,6 @@ model Transaction {
   // rawPayload is the raw payload from the source, json object
   rawPayload String
 
-  // purchase date
   purchaseDate DateTime
 
   // The date the subscription expires or renews.
@@ -148,9 +186,9 @@ model Transaction {
   quantity Int @default(1)
 
   createdAt DateTime @default(now())
+
+  // updated at is the last time the transaction was updated
   updatedAt DateTime @updatedAt
-  user      AppUser  @relation(fields: [userId], references: [id])
-  userId    String
 
   // the original transaction this transaction is related to, for example a renewal transaction of a subscription.
   // This field is null for the original transaction or for a one time purchase.
@@ -158,11 +196,13 @@ model Transaction {
   originalTransaction   Transaction?  @relation("OriginalTransactionRelation", fields: [originalTransactionId], references: [id])
   relatedTransactions   Transaction[] @relation("OriginalTransactionRelation")
 
-  // the product this transaction is for
-  Product   Product? @relation(fields: [productId], references: [id])
-  productId String?
-
   // the app this transaction is for
   App   App?    @relation(fields: [appId], references: [id])
   appId String?
+
+  Subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  subscriptionId String?
+
+  AppUser   AppUser? @relation(fields: [appUserId], references: [id])
+  appUserId String?
 }

@@ -1,5 +1,4 @@
 // Reference: https://github.com/agisboye/app-store-server-api
-
 import { X509Certificate } from 'crypto'
 import * as jose from 'jose'
 import { APPLE_ROOT_CA_G3_FINGERPRINT } from './apple-root-cert-fingerprint'
