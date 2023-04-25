@@ -1,20 +1,23 @@
 // an express app
 import express from 'express'
-import { PrismaClient } from '@prisma/client'
+import { registerAppInstallation } from './controllers'
 
 const app = express()
-const prismaClient = new PrismaClient()
+const port = process.env.PORT || 3694
 
 app.use(express.json())
 
 app.post('/api/v1/storekit-callback')
 app.post('/api/v1/google-play-callback')
 
-// sign in with an external user, if no external user provided, return an annoymous user id.
-app.post('/api/v1/auth/sign-in')
+// register an app installation
+app.post('/api/v1/installations', registerAppInstallation)
 
-// link an external user to an existing user
-app.post('/api/v1/appUsers/:appUserId/link')
+app.post('/api/v1/installations/:installationId/attributes')
 
-// set attributes like name, email, etc.
-app.post('/api/v1/appUsers/:appUserId/attributes')
+// link installation to an existing customer
+app.post('/api/v1/installations/:installationId/link')
+
+app.listen(port, () => {
+    console.log(`🚀 Server started on port ${port}. http://localhost:${port}`)
+})

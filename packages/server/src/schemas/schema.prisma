@@ -7,52 +7,44 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model AppUser {
-  id        String   @id @default(uuid())
+model Customer {
+  id               String                    @id @default(uuid())
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime                  @updatedAt
+  appInstallations CustomerAppInstallation[]
+}
+
+// enum Device type of installation
+enum DeviceType {
+  iOS
+  Android
+  Web
+}
+
+enum PushNotificationService {
+  APNS
+  FCM
+}
+
+model CustomerAppInstallation {
+  id        String   @id
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // external user id, e.g. firebase uid
-  externalUserId String?
+  Customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?
 
   App   App    @relation(fields: [appId], references: [id])
   appId String
 
-  customAttributes      Json?
-  communicationChannels CommunicationChannel[]
-  transactions          Transaction[]
-}
+  customAttributes Json?
 
-enum CommunicationChannelType {
-  Email
-  Push
-}
+  deviceType DeviceType
 
-enum CommunicationChannelSubType {
-  PushAPNS
-  PushFCM
-}
+  pushNotificationToken   String?
+  pushNotificationService PushNotificationService?
 
-model CommunicationChannel {
-  id          String    @id @default(uuid())
-  name        String
-  description String?
-  createdAt   DateTime  @default(now())
-  lastSeen    DateTime?
-
-  isActive Boolean @default(true)
-
-  // communication channel type
-  type CommunicationChannelType
-
-  // communication channel sub type
-  subType CommunicationChannelSubType?
-
-  // communication channel address, e.g. email address, push token
-  address String
-
-  AppUser   AppUser? @relation(fields: [appUserId], references: [id])
-  appUserId String?
+  transactions Transaction[]
 }
 
 model App {
@@ -72,7 +64,7 @@ model App {
   subscriptionGroups SubscriptionGroup[]
 
   // app users
-  users AppUser[]
+  installations CustomerAppInstallation[]
 
   // app transactions
   transactions Transaction[]
@@ -87,6 +79,7 @@ model SubscriptionGroup {
   updatedAt   DateTime @updatedAt
 
   subscriptions Subscription[]
+  transactions  Transaction[]
 
   App   App    @relation(fields: [appId], references: [id])
   appId String
@@ -157,7 +150,7 @@ model Transaction {
   transactionType TransactionType
 
   // rawPayload is the raw payload from the source, json object
-  rawPayload String
+  rawPayload Json?
 
   purchaseDate DateTime
 
@@ -190,9 +183,12 @@ model Transaction {
   App   App?    @relation(fields: [appId], references: [id])
   appId String?
 
+  CustomerAppInstallation   CustomerAppInstallation? @relation(fields: [customerAppInstallationId], references: [id])
+  customerAppInstallationId String?
+
   Subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
   subscriptionId String?
 
-  AppUser   AppUser? @relation(fields: [appUserId], references: [id])
-  appUserId String?
+  SubscriptionGroup   SubscriptionGroup? @relation(fields: [subscriptionGroupId], references: [id])
+  subscriptionGroupId String?
 }
