@@ -1,16 +1,20 @@
 {
-  "name": "revflow",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "engines": {
-    "pnpm": "8.2.0",
-    "node": "18.16.0"
-  }
+    "name": "revflow",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "postinstall": "prisma generate --schema=./schemas/schema.prisma"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "engines": {
+        "pnpm": "8.2.0",
+        "node": "18.16.0"
+    },
+    "devDependencies": {
+        "prisma": "^4.12.0"
+    }
 }

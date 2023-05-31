@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import { Queue, RedisOptions } from 'bullmq'
 import Redis from 'ioredis'
+import { NodeRedisPubSub } from 'node-redis-pubsub'
 
 export const prisma = new PrismaClient()
 
@@ -16,4 +17,8 @@ const redisConnection: RedisOptions = {
 export const redis = new Redis(redisConnection)
 export const workQueue = new Queue('workQueue', {
     connection: redis,
+})
+
+export const Pubsub = new NodeRedisPubSub({
+    connection: redisConnection,
 })

@@ -1,0 +1,12 @@
+{
+    "name": "sdk-server",
+    "devDependencies": {
+        "@types/node-redis-pubsub": "^3.0.1",
+        "@types/ws": "^8.5.4",
+        "shared-types": "*"
+    },
+    "dependencies": {
+        "node-redis-pubsub": "^5.0.0",
+        "ws": "^8.13.0"
+    }
+}

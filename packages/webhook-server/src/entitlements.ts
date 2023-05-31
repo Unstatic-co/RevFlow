@@ -1,11 +1,20 @@
 // a core function to calculate entitlements from a list of transactions
 
 import { Transaction } from '@prisma/client'
+import {} from '@prisma/client'
 import _ from 'lodash'
 
 export interface Entitlements {
     subscriptionGroups: SubscriptionGroupEntitlements
     subscriptions: SubscriptionEntitlements
+}
+
+export enum SubscriptionState {
+    Active = 'Active',
+    Expired = 'Expired',
+    InGracePeriod = 'InGracePeriod',
+    InBillingRetryPeriod = 'InBillingRetryPeriod',
+    Revoked = 'Revoked',
 }
 
 export function calculateEntitlements(
