@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider          = "postgresql"
+  url               = "postgresql://peter:uWq9iXyUtf4p@ep-dry-tree-867159.us-east-2.aws.neon.tech/neondb?connect_timeout=30&pool_timeout=30"
+  shadowDatabaseUrl = "postgresql://peter:uWq9iXyUtf4p@ep-dry-tree-867159.us-east-2.aws.neon.tech/shadowdb?connect_timeout=30&pool_timeout=30"
 }
 
 model Customer {
@@ -126,11 +127,42 @@ enum TransactionSource {
   GooglePlay
 }
 
-enum TransactionType {
-  Purchase
-  Renewal
-  Cancellation
+enum StoreKitTransactionType {
+  ConsumtionRequest
+  DidChangeRenewalPref
+  DidChangeRenewalStatus
+  DidFailToRenew
+  DidRenew
+  Expired
+  GracePeriodExpired
+  OfferRedeemed
+  PriceIncrease
   Refund
+  RefundDeclined
+  RenewalExtended
+  RenewalExtension
+  Revoke
+  Subscribed
+  Test
+}
+
+enum StoreKitTransactionSubtype {
+  Accepted
+  AutoRenewEnabled
+  AutoRenewDisabled
+  BillingRecovery
+  BillingRetry
+  Downgrade
+  Failure
+  GracePeriod
+  InitialBuy
+  Pending
+  PriceIncrease
+  ProductNotForSale
+  Resubscribe
+  Summary
+  Upgrade
+  Voluntary
 }
 
 enum Environemnt {
@@ -146,8 +178,9 @@ model Transaction {
   source              TransactionSource
   sourceTransactionId String
 
-  // transaction type
-  transactionType TransactionType
+  // storekit transaction type
+  storeKitTransactionType    StoreKitTransactionType?
+  storeKitTransactionSubtype StoreKitTransactionSubtype?
 
   // rawPayload is the raw payload from the source, json object
   rawPayload Json?
