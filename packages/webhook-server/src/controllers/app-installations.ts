@@ -47,16 +47,16 @@ export const registerAppInstallation = async (req: Request, res: Response) => {
 
         return res.json(response)
     } catch (error) {
-        // check if prisma error is duplicate key error
-        if (error.code === 'P2002') {
-            return res.status(400).json({
-                error: `Installation with ID ${installationId} already exists`,
-            })
-        } else {
-            return res.status(400).json({
-                error: error.message,
-            })
-        }
+        // // check if prisma error is duplicate key error
+        // if (error.code === 'P2002') {
+        //     return res.status(400).json({
+        //         error: `Installation with ID ${installationId} already exists`,
+        //     })
+        // } else {
+        //     return res.status(400).json({
+        //         error: error.message,
+        //     })
+        // }
     }
 }
 

@@ -1,12 +1,9 @@
-import { PrismaClient } from '@prisma/client'
 import { Queue, RedisOptions } from 'bullmq'
 import Redis from 'ioredis'
+import { PrismaClient } from '@prisma/client'
 
 export const prisma = new PrismaClient()
 
-// create a redis connection for queue. Using ioredis
-// redis connection can come from environment variables,
-// if no environment variables provided, use default redis connection like localhost:6379
 const redisConnection: RedisOptions = {
     host: process.env.REDIS_HOST || 'localhost',
     port: Number(process.env.REDIS_PORT) || 6379,

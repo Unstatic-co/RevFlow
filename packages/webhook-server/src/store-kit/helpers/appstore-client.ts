@@ -13,6 +13,7 @@ import {
     TransactionHistoryQuery,
 } from './models'
 import { AppStoreError } from './errors'
+import axios from 'axios'
 
 type HTTPMethod = 'GET' | 'POST'
 
@@ -136,9 +137,9 @@ export class AppStoreServerAPI {
         const url = this.baseUrl + path
         const serializedBody = body ? JSON.stringify(body) : undefined
 
-        const result = await fetch(url, {
+        const result = await axios({
+            url: url,
             method: method,
-            body: serializedBody,
             headers: {
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json',
@@ -146,15 +147,17 @@ export class AppStoreServerAPI {
         })
 
         if (result.status === 200) {
-            return result.json()
+            return result
         }
 
         switch (result.status) {
             case 400:
             case 404:
             case 500:
-                const body = await result.json()
-                throw new AppStoreError(body.errorCode, body.errorMessage)
+            // const body = result
+            // const errorCode = body['errorCode'] as number
+            // const errorMessage = body['errorMessage'] as string
+            // throw new AppStoreError(errorCode, errorMessage)
 
             case 401:
                 this.token = undefined

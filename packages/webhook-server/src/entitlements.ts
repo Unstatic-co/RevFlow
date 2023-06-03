@@ -77,7 +77,7 @@ export function calculateEntitlements(
         }
 
         // if the latest transaction is a refund, continue to the next subscription group
-        if (latestTransaction.transactionType === 'Refund') {
+        if (isRefundTransaction(latestTransaction)) {
             continue
         }
 
@@ -90,7 +90,7 @@ export function calculateEntitlements(
         // if the latest expiration date transaction is a refund, continue to the next subscription group
         if (
             latestExpirationDateTransaction &&
-            latestExpirationDateTransaction.transactionType === 'Refund'
+            isRefundTransaction(latestTransaction)
         ) {
             continue
         }
@@ -116,5 +116,13 @@ type SubscriptionGroupEntitlements = {
 type SubscriptionEntitlements = {
     [subscriptionId: string]: {
         expirationDate: Date
+    }
+}
+
+function isRefundTransaction(transaction: Transaction): boolean {
+    if (transaction.storeKitTransactionType) {
+        return transaction.storeKitTransactionType == 'Refund'
+    } else {
+        return false
     }
 }
